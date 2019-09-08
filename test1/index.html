@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Melbourne parking data</title>
+	<style>
+		#map {
+			height: 100%;
+		}
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+<div id="div1"><h1>Pull Melbourne City parking data</h1></div>
+<button>Refresh available spaces</button>
+
+<div id="map"></div>
+<script> 
+	function initMap() {
+		var parks = [];
+		var map
+
+		$(document).ready(function(){
+			$("button").click(function(){
+				$.ajax({
+					url: "https://data.melbourne.vic.gov.au/resource/vh2v-4nfs.json", 
+					type: 'GET',
+    				dataType: 'json',
+    				success: function(result){
+						console.log(result);
+						parks.push(result)
+					}
+				});
+			});
+		});
+		
+		map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 13,
+			center: new google.maps.LatLng(-37.8, 144.95),
+			mapTypeId: 'terrain'
+		});
+
+		mashParks(parks);
+	}
+
+	function mashParks(results) {
+		for (var i = 0; i < results.length; i++) {
+			var latitude = results[i].lat;
+			var longitude = results[i].lon;
+			var latLng = new google.maps.LatLng(latitude, longitude);
+			var marker = new google.maps.Marker({
+				position: latLng,
+				map: map,
+				label:results[i].bay_id
+			});
+		}
+	}
+
+</script>
+<script async defer
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdFBg8PAH0SDSPsNVoqv3yrfLrAkCKijM&callback=initMap">
+</script>
+
+</body>
+</html>
